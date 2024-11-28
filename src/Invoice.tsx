@@ -275,6 +275,8 @@ const Invoice = ({ order }: { order: Order }) => {
             <Text style={styles.cell}>Qty</Text>
             <Text style={styles.cell}>Unit Price </Text>
             <Text style={styles.cell}>Net Amount </Text>
+            <Text style={styles.cell}>Tax Amount </Text>
+            <Text style={styles.cell}>Installation Charges </Text>
             <Text style={styles.cell}>Total (with GST) </Text>
           </View>
           {order.OrderItem.map((item) => (
@@ -291,7 +293,7 @@ const Invoice = ({ order }: { order: Order }) => {
                   },
                 ]}
               >
-                {renderPriceWithRupee(item.price)}
+                {renderPriceWithRupee(item.price / item.quantity)}
               </View>
               {/* Net Amount */}
               <View
@@ -304,7 +306,7 @@ const Invoice = ({ order }: { order: Order }) => {
                   },
                 ]}
               >
-                {renderPriceWithRupee(item.quantity * item.price)}
+                {renderPriceWithRupee(item.price)}
               </View>
               <View
                 style={[
@@ -316,7 +318,33 @@ const Invoice = ({ order }: { order: Order }) => {
                   },
                 ]}
               >
-                {renderPriceWithRupee(item.quantity * item.priceWithGst)}
+                {renderPriceWithRupee(item.priceWithGst - item.price)}
+              </View>
+              <View
+                style={[
+                  styles.cell,
+                  {
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                {item.product.isInstallationReq
+                  ? renderPriceWithRupee(item.quantity * 50) // the installation charge will come from api
+                  : "N/A"}
+              </View>
+              <View
+                style={[
+                  styles.cell,
+                  {
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                {renderPriceWithRupee(item.priceWithGst)}
               </View>
             </View>
           ))}
@@ -338,15 +366,18 @@ const Invoice = ({ order }: { order: Order }) => {
             </Text>
           </View>
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Others:</Text>
+            <Text style={styles.totalLabel}>Platform Fee:</Text>
             <Text style={styles.totalValue}>
-              {order.totalBillWithGst && order.totalBill
-                ? renderPriceWithRupee(
-                    order.totalBillWithAdditionalCharges -
-                      order.totalBillWithGst
-                  )
-                : "N/A"}
-            </Text>
+              {renderPriceWithRupee(10)}
+            </Text>{" "}
+            {/* will come from api */}
+          </View>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>Shipping Fee:</Text>
+            <Text style={styles.totalValue}>
+              {renderPriceWithRupee(1000)}
+            </Text>{" "}
+            {/* will come from api */}
           </View>
           <View style={styles.totalRow}>
             <Text style={styles.grandTotalLabel}>Grand Total:</Text>
